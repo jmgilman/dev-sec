@@ -21,113 +21,113 @@ readonly reset='\e[0m'
 #
 # Prints all arguments on the standard error stream
 error() {
-    printf "${red}!!! %s${reset}\n" "${*}" 1>&2
+	printf "${red}!!! %s${reset}\n" "${*}" 1>&2
 }
 
 # Usage: log [ARG]...
 #
 # Prints all arguments on the standard output stream
 log() {
-    printf "${yellow}>> %s${reset}\n" "${*}"
+	printf "${yellow}>> %s${reset}\n" "${*}"
 }
 
 # Usage: success [ARG]...
 #
 # Prints all arguments on the standard output stream
 success() {
-    printf "${green}>> %s${reset}\n" "${*}"
+	printf "${green}>> %s${reset}\n" "${*}"
 }
 
 # Usage: die MESSAGE
 #
 # Prints the specified error message and exits with an error status
 die() {
-    error "${*}"
-    exit 1
+	error "${*}"
+	exit 1
 }
 
 # Usage: yesno MESSAGE
 #
 # Asks the user for an answer via y/n syntax.
 yesno() {
-    read -p "${*} [y/n] " -r
-    printf "\n"
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        return 1
-    else
-        return 0
-    fi
+	read -p "${*} [y/n] " -r
+	printf "\n"
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		return 1
+	else
+		return 0
+	fi
 }
 
 # Usage: yesno_exit MESSAGE
 #
 # Asks the user to confirm via y/n syntax. Exits if answer is no.
 yesno_exit() {
-    read -p "${*} [y/n] " -r
-    printf "\n"
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        exit 1
-    fi
+	read -p "${*} [y/n] " -r
+	printf "\n"
+	if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+		exit 1
+	fi
 }
 
 # Usage: block_network
 #
 # Sets a soft block on Wifi and Bluetooth adapters.
 block_network() {
-    restart=0
-    wstatus=$(rfkill -J | jq -r ".rfkilldevices[] | select ( .type == \"wlan\") | .soft")
-    if [[ "${wstatus}" == "unblocked" ]]; then
-        log "Wifi is not blocked. Using rfkill to block wifi..."
-        sudo rfkill block wifi
-        restart=1
-    else
-        success "Wifi is blocked."
-    fi
+	restart=0
+	wstatus=$(rfkill -J | jq -r ".rfkilldevices[] | select ( .type == \"wlan\") | .soft")
+	if [[ "${wstatus}" == "unblocked" ]]; then
+		log "Wifi is not blocked. Using rfkill to block wifi..."
+		sudo rfkill block wifi
+		restart=1
+	else
+		success "Wifi is blocked."
+	fi
 
-    bstatus=$(rfkill -J | jq -r ".rfkilldevices[] | select ( .type == \"bluetooth\") | .soft")
-    if [[ "${bstatus}" == "unblocked" ]]; then
-        log "Bluetooth is not blocked. Using rfkill to block bluetooth..."
-        sudo rfkill block bluetooth
-        restart=1
-    else
-        success "Bluetooth is blocked."
-    fi
+	bstatus=$(rfkill -J | jq -r ".rfkilldevices[] | select ( .type == \"bluetooth\") | .soft")
+	if [[ "${bstatus}" == "unblocked" ]]; then
+		log "Bluetooth is not blocked. Using rfkill to block bluetooth..."
+		sudo rfkill block bluetooth
+		restart=1
+	else
+		success "Bluetooth is blocked."
+	fi
 
-    if [[ ${restart} == 1 ]]; then
-        die "Please reboot the system to apply the changes."
-    fi
+	if [[ ${restart} == 1 ]]; then
+		die "Please reboot the system to apply the changes."
+	fi
 }
 
 # Usage: gen_primary FULLNAME EMAIL PASSPHRASE ALG
 #
 # Generates a GnuPG primary key using the given arguments.
 gen_primary() {
-    local name="${1}"
-    local email="${2}"
-    local pass="${3}"
-    local alg="${4}"
+	local name="${1}"
+	local email="${2}"
+	local pass="${3}"
+	local alg="${4}"
 
-    gpg --batch \
-        --passphrase "${pass}" \
-        --quick-generate-key \
-        "${name} <${email}>" \
-        "${alg}" cert,sign never
+	gpg --batch \
+		--passphrase "${pass}" \
+		--quick-generate-key \
+		"${name} <${email}>" \
+		"${alg}" cert,sign never
 }
 
 # Usage: gen_subkey PASSPHRASE FINGERPRINT ALGORITHM FUNCTION EXPIRES
 #
 # Adds a new subkey to primary key (FINGERPRINT) using given arguments.
 gen_subkey() {
-    local pass="${1}"
-    local fp="${2}"
-    local alg="${3}"
-    local func="${4}"
-    local expire="${5}"
+	local pass="${1}"
+	local fp="${2}"
+	local alg="${3}"
+	local func="${4}"
+	local expire="${5}"
 
-    gpg --batch \
-        --pinentry-mode=loopback \
-        --passphrase "${primary_pass}" \
-        --quick-add-key "${fp}" "${alg}" "${func}" "${expire}"
+	gpg --batch \
+		--pinentry-mode=loopback \
+		--passphrase "${primary_pass}" \
+		--quick-add-key "${fp}" "${alg}" "${func}" "${expire}"
 }
 
 log "Welcome!"
@@ -158,8 +158,8 @@ log "Now I will generate a strong randomized password for the primary key."
 log "Please write down and store this password in a safe place."
 
 primary_pass="$(
-    tr -dc '[:upper:]' </dev/urandom | fold -w 20 | head -n1
-    echo
+	tr -dc '[:upper:]' </dev/urandom | fold -w 20 | head -n1
+	echo
 )"
 printf "${yellow}>> Primary key passphrase: ${cyan}%s${reset}\n" "${primary_pass}"
 yesno_exit "Confirm the passphrase has been stored safely."
@@ -199,14 +199,14 @@ mkdir -p "${GNUPGHOME}/backup"
 
 log "Backing up primary key..."
 gpg --batch \
-    --pinentry-mode=loopback \
-    --passphrase "${primary_pass}" \
-    --armor --export-secret-keys "${fp}" >"${GNUPGHOME}/backup/master.asc"
+	--pinentry-mode=loopback \
+	--passphrase "${primary_pass}" \
+	--armor --export-secret-keys "${fp}" >"${GNUPGHOME}/backup/master.asc"
 log "Backing up subkeys..."
 gpg --batch \
-    --pinentry-mode=loopback \
-    --passphrase "${primary_pass}" \
-    --armor --export-secret-subkeys "${fp}" >"${GNUPGHOME}/backup/sub.asc"
+	--pinentry-mode=loopback \
+	--passphrase "${primary_pass}" \
+	--armor --export-secret-subkeys "${fp}" >"${GNUPGHOME}/backup/sub.asc"
 log "Backing up revocation certificate..."
 cp "${GNUPGHOME}/openpgp-revocs.d/${fp}.rev" "${GNUPGHOME}/backup/${fp}.rev"
 
@@ -217,8 +217,8 @@ log "Now I will generate a strong randomized password for the backup media."
 log "Please write down and store this password in a safe place."
 
 backup_pass="$(
-    tr -dc '[:upper:]' </dev/urandom | fold -w 20 | head -n1
-    echo
+	tr -dc '[:upper:]' </dev/urandom | fold -w 20 | head -n1
+	echo
 )"
 printf "${yellow}>> Backup media passphrase: ${cyan}%s${reset}\n" "${backup_pass}"
 yesno_exit "Confirm the passphrase has been stored safely."
@@ -241,10 +241,10 @@ yesno_exit "Continue?"
 log "It's best practice to write randomized data to the backup media."
 log "This will prepare it for securely holding encrypted data."
 if yesno "Would you like to perform this step?"; then
-    log "Preparing USB backup media..."
-    sudo dd if=/dev/urandom of="${device}" bs=4M status=progress
+	log "Preparing USB backup media..."
+	sudo dd if=/dev/urandom of="${device}" bs=4M status=progress
 else
-    log "Skipping..."
+	log "Skipping..."
 fi
 
 log "Creating a new partition..."

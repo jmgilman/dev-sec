@@ -19,37 +19,37 @@ readonly reset='\e[0m'
 #
 # Prints all arguments on the standard error stream
 error() {
-    printf "${red}!!! %s${reset}\n" "${*}" 1>&2
+	printf "${red}!!! %s${reset}\n" "${*}" 1>&2
 }
 
 # Usage: log [ARG]...
 #
 # Prints all arguments on the standard output stream
 log() {
-    printf "${yellow}>> %s${reset}\n" "${*}"
+	printf "${yellow}>> %s${reset}\n" "${*}"
 }
 
 # Usage: success [ARG]...
 #
 # Prints all arguments on the standard output stream
 success() {
-    printf "${green}>> %s${reset}\n" "${*}"
+	printf "${green}>> %s${reset}\n" "${*}"
 }
 
 # Usage: die MESSAGE
 #
 # Prints the specified error message and exits with an error status
 die() {
-    error "${*}"
-    exit 1
+	error "${*}"
+	exit 1
 }
 
 if [[ -z "${1}" ]]; then
-    die "Must specify the block device to import from."
+	die "Must specify the block device to import from."
 fi
 
 if [[ ! -b "${1}" ]]; then
-    die "Invalid block device: ${1}"
+	die "Invalid block device: ${1}"
 fi
 
 device="${1}"

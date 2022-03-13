@@ -1,0 +1,45 @@
+repos:
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: 8fe62d14e0b4d7d845a7022c5c2c3ae41bdd3f26 # v4.1.0
+    hooks:
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: local
+    hooks:
+    -   id: gitlint
+        name: gitlint
+        entry: gitlint
+        args: [--staged, --msg-filename]
+        language: system
+        stages: [commit-msg]
+-   repo: local
+    hooks:
+    -   id: mdformat
+        name: mdformat
+        entry: mdformat
+        args: [--wrap, '80', --check]
+        language: system
+        types: [markdown]
+-   repo: local
+    hooks:
+    -   id: markdownlint
+        name: markdownlint
+        entry: markdownlint
+        language: system
+        types: [markdown]
+-   repo: local
+    hooks:
+    -   id: shfmt
+        name: shfmt
+        entry: shfmt
+        args: [-w]
+        language: system
+        types: [shell]
+-   repo: local
+    hooks:
+    -   id: shellcheck
+        name: shellcheck
+        entry: shellcheck
+        language: system
+        types: [shell]

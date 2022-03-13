@@ -12,9 +12,12 @@
           inherit system;
         };
         devPkgs = [
+            pkgs.gitlint
             pkgs.shellcheck
             pkgs.shfmt
             pkgs.nodePackages.markdownlint-cli
+            pkgs.pre-commit
+            pkgs.python39Packages.mdformat
         ];
       in {
         devShell = pkgs.mkShell {
