@@ -23,19 +23,19 @@
             pkgs.paperkey
             pkgs.rng-tools
             pkgs.wget
-            (pkgs.writeScriptBin "key_build" (builtins.readFile ./key_build.sh))
-            (pkgs.writeScriptBin "key_open" (builtins.readFile ./key_open.sh))
-            (pkgs.writeScriptBin "key_workspace" (builtins.readFile ./key_workspace.sh))
+            (pkgs.writeScriptBin "key_build" (builtins.readFile ./scripts/key_build.sh))
+            (pkgs.writeScriptBin "key_open" (builtins.readFile ./scripts/key_open.sh))
+            (pkgs.writeScriptBin "key_workspace" (builtins.readFile ./scripts/key_workspace.sh))
           ];
 
           environment.etc."key/gpg.conf" = {
             mode = "0644";
-            text = (builtins.readFile ./gpg.conf);
+            text = (builtins.readFile ./config/gpg.conf);
           };
 
           environment.etc."key/gpg-agent.conf" = {
             mode = "0644";
-            text = (builtins.readFile ./gpg-agent.conf);
+            text = (builtins.readFile ./config/gpg-agent.conf);
           };
 
           # Use default nixos user with no password and enable autologin
