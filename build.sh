@@ -49,7 +49,7 @@ if ! command -v multipass; then
 fi
 
 log "Mounting local directory to instance..."
-multipass mount "${PWD}" dev-sec:/dev-sec
+multipass mount "${PWD}/image" dev-sec:/dev-sec
 
 log "Building flake..."
 multipass exec dev-sec -- .nix-profile/bin/nix build /dev-sec#images.rpi
