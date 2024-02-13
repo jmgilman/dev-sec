@@ -11,6 +11,8 @@ set -o errexit  # abort on nonzero exitstatus
 set -o nounset  # abort on unbound variable
 set -o pipefail # don't hide errors within pipes
 
+trap '[[ $? -ne 0 ]] && echo "Hit <Enter> to exit" && read' EXIT
+
 readonly yellow='\e[0;33m'
 readonly green='\e[0;32m'
 readonly red='\e[0;31m'
@@ -44,12 +46,38 @@ die() {
 	exit 1
 }
 
+# Usage: check_env
+# exports special variables to the environment to distinguish OS type
+# 
+#   WSL: Windows Subsystem for Linux
+#
+check_env() {
+	if uname -a | grep -Eiq '(NT|Microsoft|WSL)'; then
+		export WSL=1
+		log "Detected running in WSL.."
+	fi
+}
+
 if ! command -v multipass; then
 	die "Multipass must be installed before running this script"
 fi
 
+check_env
+
+LOCAL_MOUNTPOINT="$PWD"/image
+if [ -v WSL ]; then
+	log "Configuring multipass to allow instances to mount local filesystem...
+Local mounts are disabled by default on windows..."
+	if ! multipass set local.privileged-mounts=Yes; then
+		die "Couldn't set local.privileged-mounts setting on WSL"
+	fi
+	if multipass version | grep -iq win; then
+		LOCAL_MOUNTPOINT="$(wslpath -w $LOCAL_MOUNTPOINT)"
+		log "multipass is a windows .exe, converting $PWD to $LOCAL_MOUNTPOINT.."
+	fi
+fi
 log "Mounting local directory to instance..."
-multipass mount "${PWD}/image" dev-sec:/dev-sec
+multipass mount $LOCAL_MOUNTPOINT dev-sec:/dev-sec
 
 log "Building flake..."
 multipass exec dev-sec -- .nix-profile/bin/nix build /dev-sec#images.rpi

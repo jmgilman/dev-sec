@@ -11,6 +11,8 @@ set -o errexit  # abort on nonzero exitstatus
 set -o nounset  # abort on unbound variable
 set -o pipefail # don't hide errors within pipes
 
+trap '[[ $? -ne 0 ]] && echo "Hit <Enter> to exit" && read' EXIT
+
 readonly yellow='\e[0;33m'
 readonly green='\e[0;32m'
 readonly red='\e[0;31m'
